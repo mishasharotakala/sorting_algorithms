@@ -1,51 +1,38 @@
 #include "sort.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 /**
- *_swapint-Fuction that swaps integers
- *@num1:The first integer to be swaped
- *@num2:The second integer to be swaped
- *
- *Return: Void
- */
-
-void _swapint(int *num1, int *num2)
-{
-	int temp;
-
-	temp = *num1;
-	*num1 = *num2;
-	*num2 = temp;
-}
-
-/**
- * bubble_sort - sorts an array of integers in ascending order.
- *@array: Pointer to the elements
- *@size: size of the array
- *
- *Description: Prints the array after each swap
+ * bubble_sort - a function that sorts an array of integers in ascg order
+ * @array: sort array.
+ * @size: size of array.
+ * Return: Void function.
  */
 
 void bubble_sort(int *array, size_t size)
 {
-	size_t i, len = size;
-	bool s = false;
+size_t tmp, traverse, j;
 
-	if (array == NULL || size < 2)
-		return;
+if (array == NULL || size < 2)
+{
+return;
+}
 
-	while (s == false)
-	{
-		s = true;
-
-		for (i = 0; i < len - 1; i++)
-		{
-			if (array[i] > array[i + 1])
-			{
-				_swapint(array + i, array + i + 1);
-				print_array(array, size);
-				s = false;
-			}
-		}
-		len--;
-	}
+/** loop then traverseerse an array */
+for (traverse = 1; traverse < size; traverse++)
+{
+/** loop index the element */
+for (j = 0; j < size - 1; j++)
+{
+/** freater element */
+if (array[j] > array[j + 1])
+{
+/** the swap of elements */
+tmp = array[j];
+array[j] = array[j + 1];
+array[j + 1] = tmp;
+print_array(array, size);
+}
+}
+}
 }
