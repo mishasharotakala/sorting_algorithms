@@ -1,54 +1,72 @@
 #include "sort.h"
-#include "stdlib.h"
+/**
+*integer_count- number of times integer appears in an array
+*
+*@array: array given
+*@size: size of array
+*@range: number to check for occurance
+*
+*Return: number of occurances
+*/
+int integer_count(int *array, size_t size, int range)
+{
+	int total = 0;
+	size_t i;
+
+	for (i = 0; i < size; i++)
+	{
+		if (array[i] == range)
+			total++;
+	}
+	return (total);
+}
 
 /**
- * counting_sort - sorts an array of integers in ascending order using the
- * Counting sort algorithm
- * @array: array to sort
- * @size: size of the array to sort
- *
- * Return: void
- */
+*counting_sort - counting sort algorithm
+*
+*@array: array to be sorted
+*@size: size of the array
+*/
 void counting_sort(int *array, size_t size)
 {
-	int i, max;
-	int *count = NULL, *copy = NULL;
-	size_t j, temp, total = 0;
+	int k = 0, b = 0, r = 0;
+	size_t i, c;
+	int *array2, *newArray;
 
-
-	if (array == NULL || size < 2)
+	if (!array || size < 2)
 		return;
-	copy = malloc(sizeof(int) * size);
-	if (copy == NULL)
+	for (i = 0; i < size; i++)
+	{
+		if (array[i] > k)
+		{
+			k = array[i];
+		}
+	}
+	array2 = malloc(sizeof(int) * (k + 1));
+	if (!array2)
 		return;
-	for (j = 0, max = 0; j < size; j++)
+	for (c = 0; c < ((size_t)k + 1); c++)
 	{
-		copy[j] = array[j];
-		if (array[j] > max)
-			max = array[j];
+		if (c == 0)
+			array2[c] = integer_count(array, size, r);
+		else
+		{
+			b = array2[c - 1] + integer_count(array, size, r);
+			array2[c] = b;
+		}
+		r++;
 	}
-	count = malloc(sizeof(int) * (max + 1));
-	if (count == NULL)
+	print_array(array2, (k + 1));
+	newArray = malloc(sizeof(int) * size);
+	if (!newArray)
 	{
-		free(copy);
+		free(array2);
 		return;
 	}
-	for (i = 0; i <= max; i++)
-		count[i] = 0;
-	for (j = 0; j < size; j++)
-		count[array[j]] += 1;
-	for (i = 0; i <= max; i++)
-	{
-		temp = count[i];
-		count[i] = total;
-		total += temp;
-	}
-	for (j = 0; j < size; j++)
-	{
-		array[count[copy[j]]] = copy[j];
-		count[copy[j]] += 1;
-	}
-	print_array(count, max + 1);
-	free(count);
-	free(copy);
+	for (i = 0; i < size; i++)
+		newArray[array2[array[i]]-- - 1] = array[i];
+	for (i = 0; i < size; i++)
+		array[i] = newArray[i];
+	free(newArray);
+	free(array2);
 }
