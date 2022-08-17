@@ -1,85 +1,78 @@
 #include "sort.h"
-#include <stdlib.h>
 
 /**
- * pow_10 - calculates a positive power of 10
- * @power: power of 10 to calculate
+ * get_digit - gets a digit from a number
+ * @number: the integer
+ * @digit: the digit position to get
  *
- * Return: the corresponding power of 10
- */
-unsigned int pow_10(unsigned int power)
+ * Return: the digit value at given position
+**/
+int get_digit(long number, int digit)
 {
-	unsigned int i, result;
+	long i = 0L, pow = 1L, ret;
 
-	result = 1;
-	for (i = 0; i < power; i++)
-		result *= 10;
-	return (result);
+	for (i = 0; i < digit; i++)
+		pow *= 10L;
+	ret = ((number / pow) % 10);
+	return (ret);
 }
 
 /**
- * count_sort - sorts an array of integers in ascending order at a specific
- * digit location using the Counting sort algorithm
- * @array: array to sort
- * @size: size of the array to sort
- * @digit: digit to sort by
+ * radix_pass - sorts by radix
+ * @array: the integer array to sort
+ * @size: the size of the array
+ * @digit: the current digit to check
+ * @new_array: target array of same size
  *
- * Return: 1 if there is a need to keep sorting, 0 if not
+ * Return: void.
  */
-unsigned int count_sort(int *array, size_t size, unsigned int digit)
+int radix_pass(int *array, ssize_t size, int digit, int *new_array)
 {
-	int i, count[10] = {0};
-	int *copy = NULL;
-	size_t j, temp, total = 0;
-	unsigned int dp1, dp2, sort = 0;
+	ssize_t i;
+	int buckets[10] = {0};
 
-	dp2 = pow_10(digit - 1);
-	dp1 = dp2 * 10;
-	copy = malloc(sizeof(int) * size);
-	if (copy == NULL)
-		exit(1);
-	for (j = 0; j < size; j++)
-	{
-		copy[j] = array[j];
-		if (array[j] / dp1 != 0)
-			sort = 1;
-	}
-	for (i = 0; i < 10 ; i++)
-		count[i] = 0;
-	for (j = 0; j < size; j++)
-		count[(array[j] % dp1) / dp2] += 1;
-	for (i = 0; i < 10; i++)
-	{
-		temp = count[i];
-		count[i] = total;
-		total += temp;
-	}
-	for (j = 0; j < size; j++)
-	{
-		array[count[(copy[j] % dp1) / dp2]] = copy[j];
-		count[(copy[j] % dp1) / dp2] += 1;
-	}
-	free(copy);
-	return (sort);
+	for (i = 0; i < size; i++)
+		buckets[get_digit(array[i], digit)]++;
+	for (i = 1; i <= 9; i++)
+		buckets[i] += buckets[i - 1];
+	for (i = size - 1; i > -1; i--)
+		new_array[buckets[get_digit(array[i], digit)]-- - 1] = array[i];
+	return (1);
 }
 
 /**
- * radix_sort - sorts an array of integers in ascending order using
- * the Radix sort algorithm
- * @array: array to sort
- * @size: size of the array
+ * radix_sort - sorts by radix
+ * @size: the size of the array
+ * @array: the integer array to sort
  *
- * Return: void
+ * Return: the gap size
  */
 void radix_sort(int *array, size_t size)
 {
-	unsigned int i, sort = 1;
+	int *old_array, *new_array, *temp_ptr, *ptr, max = 0;
+	size_t i, sd = 1;
 
-	if (array == NULL || size < 2)
+	if (!array || size < 2)
 		return;
-	for (i = 1; sort == 1; i++)
+
+	for (i = 0; i < size; i++)
+		if (array[i] > max)
+			max = array[i];
+	while (max /= 10)
+		sd++;
+	old_array = array;
+	new_array = ptr = malloc(sizeof(int) * size);
+	if (!new_array)
+		return;
+	for (i = 0; i < sd; i++)
 	{
-		sort = count_sort(array, size, i);
-		print_array(array, size);
+		radix_pass(old_array, (ssize_t)size, i, new_array);
+		temp_ptr = old_array;
+		old_array = new_array;
+		new_array = temp_ptr;
+		print_array(old_array, size);
 	}
+	for (i = 0; i < size; i++)
+		array[i] = old_array[i];
+	free(ptr);
 }
