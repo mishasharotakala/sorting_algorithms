@@ -1,76 +1,54 @@
-#include <stdio.h>
-#include <stdlib.h>
 #include "sort.h"
 
 /**
- * create_listint - Creates a doubly linked list from an array of integers
- * @array: Array to convert to a doubly linked list
- * @size: Size of the array
- *
- * Return: Pointer to the first element of the created list. NULL on failure
- */
-listint_t *create_listint(const int *array, size_t size)
-{
-	listint_t *list;
-	listint_t *node;
-	int *tmp;
-
-	list = NULL;
-	while (size--)
-	{
-		node = malloc(sizeof(*node));
-		if (!node)
-			return (NULL);
-		tmp = (int *)&node->n;
-		*tmp = array[size];
-		node->next = list;
-		node->prev = NULL;
-		list = node;
-		if (list->next)
-			list->next->prev = list;
-	}
-	return (list);
-}
-
-
-/**
- * free_list - Frees the doubly linked list
- * @list: Pointer to the beginning of the list
+ * swap - swaps 2 nodes in a doubly-linked list
+ * @a: address of first node
+ * @b: address of second node
  *
  * Return: void
  */
-void free_list(listint_t *list)
+void swap(listint_t *a, listint_t *b)
 {
-	listint_t *next;
+	if (a->prev)
+		a->prev->next = b;
+	if (b->next)
+		b->next->prev = a;
+	a->next = b->next;
+	b->prev = a->prev;
+	a->prev = b;
+	b->next = a;
 
-	while (list)
-	{
-		next = list->next;
-		free(list);
-		list = next;
-	}
 }
 
-
 /**
- * main - Entry point
+ * insertion_sort_list - insertion sorts a doubly-linked list
+ * @list: address of pointer to head node
  *
- * Return: Always 0
+ * Return: void
  */
-int main(void)
+void insertion_sort_list(listint_t **list)
 {
-	listint_t *list;
-	int array[] = {19, 48, 99, 71, 13, 52, 96, 73, 86, 7};
-	size_t n = sizeof(array) / sizeof(array[0]);
+	listint_t *i, *j;
 
-	list = create_listint(array, n);
-	if (!list)
-		return (1);
-	print_list(list);
-	printf("\n");
-	insertion_sort_list(&list);
-	printf("\n");
-	print_list(list);
-	free_list(list);
-	return (0);
+	if (!list || !*list || !(*list)->next)
+		return;
+	i = (*list)->next;
+	while (i)
+	{
+		j = i;
+		i = i->next;
+		while (j && j->prev)
+		{
+			if (j->prev->n > j->n)
+			{
+				swap(j->prev, j);
+				if (!j->prev)
+					*list = j;
+				print_list((const listint_t *)*list);
+			}
+			else
+				j = j->prev;
+		}
+
+	}
 }
